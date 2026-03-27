@@ -1,0 +1,207 @@
+import { useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import "../../styles/auth.css";
+
+export default function Signup() {
+  const navigate = useNavigate();
+  const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const canSubmit = useMemo(() => {
+    return (
+      form.name.trim().length >= 2 &&
+      form.email.trim() &&
+      form.password.trim().length >= 6
+    );
+  }, [form]);
+
+  const onChange = (e) => {
+    setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
+    setError("");
+    setSuccess("");
+  };
+
+  async function onSubmit(e) {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (!canSubmit) {
+      setError("Please fill all fields correctly (password min 6 characters).");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Save user data in localStorage instead of backend
+      const users = JSON.parse(localStorage.getItem("users")) || [];
+
+      const alreadyExists = users.some(
+        (user) => user.email.toLowerCase() === form.email.toLowerCase()
+      );
+
+      if (alreadyExists) {
+        setError("User already exists with this email.");
+        setLoading(false);
+        return;
+      }
+
+      const newUser = {
+        name: form.name,
+        email: form.email,
+        password: form.password,
+      };
+
+      users.push(newUser);
+      localStorage.setItem("users", JSON.stringify(users));
+
+      setSuccess("Account created successfully ✅ Redirecting to login...");
+
+      setForm({ name: "", email: "", password: "" });
+
+      setTimeout(() => {
+        navigate("/login", { replace: true });
+      }, 800);
+    } catch (err) {
+      setError("Signup failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="auth-page auth-page-center">
+      <div className="container py-5">
+        <div className="row justify-content-center">
+          <div className="col-12 col-sm-10 col-md-8 col-lg-5">
+            <div className="auth-card animate-auth">
+              <div className="text-center mb-3">
+                <div className="auth-badge-sm mx-auto">
+                  <i className="bi bi-stars" />
+                </div>
+                <div className="auth-kicker mt-3">Elite</div>
+                <h1 className="auth-title mb-1">Create account</h1>
+                <div className="auth-subtitle">
+                  Already have an account?{" "}
+                  <Link to="/login" className="auth-link">
+                    Login
+                  </Link>
+                </div>
+              </div>
+
+              {error && (
+                <div className="alert alert-danger py-2 mb-3" role="alert">
+                  <i className="bi bi-exclamation-triangle me-2" />
+                  {error}
+                </div>
+              )}
+
+              {success && (
+                <div className="alert alert-success py-2 mb-3" role="alert">
+                  <i className="bi bi-check-circle me-2" />
+                  {success}
+                </div>
+              )}
+
+              <form onSubmit={onSubmit}>
+                <div className="mb-3">
+                  <label className="form-label">Full Name</label>
+                  <div className="auth-input">
+                    <i className="bi bi-person" />
+                    <input
+                      name="name"
+                      className="form-control"
+                      placeholder="Your name"
+                      value={form.name}
+                      onChange={onChange}
+                      autoComplete="name"
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">Email</label>
+                  <div className="auth-input">
+                    <i className="bi bi-envelope" />
+                    <input
+                      type="email"
+                      name="email"
+                      className="form-control"
+                      placeholder="you@example.com"
+                      value={form.email}
+                      onChange={onChange}
+                      autoComplete="email"
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-2">
+                  <label className="form-label">Password</label>
+                  <div className="auth-input">
+                    <i className="bi bi-lock" />
+                    <input
+                      type={show ? "text" : "password"}
+                      name="password"
+                      className="form-control"
+                      placeholder="Create password"
+                      value={form.password}
+                      onChange={onChange}
+                      autoComplete="new-password"
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      className="auth-eye"
+                      onClick={() => setShow((p) => !p)}
+                      aria-label={show ? "Hide password" : "Show password"}
+                      disabled={loading}
+                    >
+                      <i className={`bi ${show ? "bi-eye-slash" : "bi-eye"}`} />
+                    </button>
+                  </div>
+                  <div className="auth-help mt-2">Use at least 6 characters.</div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="btn btn-primary w-100 auth-btn"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2" />
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      Create account <i className="bi bi-arrow-right ms-1" />
+                    </>
+                  )}
+                </button>
+
+                <div className="auth-foot mt-4 text-center">
+                  By creating an account, you agree to our{" "}
+                  <span className="auth-muted-link">Terms</span> and{" "}
+                  <span className="auth-muted-link">Privacy Policy</span>.
+                </div>
+              </form>
+            </div>
+
+            <div className="text-center mt-3">
+              <Link to="/" className="auth-link small">
+                ← Back to Home
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
