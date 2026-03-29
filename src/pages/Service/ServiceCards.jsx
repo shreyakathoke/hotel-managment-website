@@ -5,22 +5,22 @@ const SERVICES = [
   {
     icon: "bi bi-house-door",
     title: "Houseboat Stays",
-    desc: "Drift along the tranquil backwaters in a traditional Kettuvallam.",
+    desc: "Experience serene backwaters aboard a traditional houseboat, combining comfort with scenic beauty.",
   },
   {
     icon: "bi bi-cup-hot",
     title: "Tea Gardens",
-    desc: "Walk through the lush green tea plantations of Munnar.",
+    desc: "Stroll through lush tea plantations and enjoy guided tours of our aromatic gardens.",
   },
   {
     icon: "bi bi-heart-pulse",
     title: "Ayurveda Wellness",
-    desc: "Rejuvenate your mind and body with ancient Ayurvedic treatments.",
+    desc: "Relax and rejuvenate with authentic Ayurvedic therapies designed to balance body and mind.",
   },
   {
     icon: "bi bi-tree",
     title: "Hill Trekking",
-    desc: "Explore the misty peaks and wildlife of the Western Ghats.",
+    desc: "Embark on adventurous treks through misty hills, discovering hidden trails and breathtaking views.",
   },
 ];
 

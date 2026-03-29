@@ -53,11 +53,11 @@ export default function AmazingServices() {
             <h2 className="as-title">Amazing Services</h2>
 
             <p className="as-text">
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Donec malesuada lorem
-              maximus mauris scelerisque, at rutrum nulla dictum. Ut ac ligula sapien. Suspendisse
-              cursus faucibus finibus. Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-              Donec malesuada lorem maximus mauris scelerisque, at rutrum nulla dictum. Ut ac ligula
-              sapien. Suspendisse cursus faucibus finibus.
+                At Hotel Elite, we offer exceptional services to make your stay truly memorable.
+                From personalized concierge support to 24/7 room service, every detail is crafted for your comfort.
+                Enjoy luxurious amenities, seamless check-in, and attentive staff ready to cater to your needs.
+                Our goal is to provide an effortless and enjoyable experience for every guest.
+
             </p>
 
             <button type="button" className="as-btn">

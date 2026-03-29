@@ -4,10 +4,10 @@ import "aos/dist/aos.css";
 
 import "../../styles/visualJourney.css";
 
-import g1 from "../../assets/gallery.jpg";
+import g1 from "../../assets/about-intro.jpg";
 import g2 from "../../assets/gallery1.jpg";
-import g3 from "../../assets/gallery2.jpg";
-import g4 from "../../assets/gallery5.jpg";
+import g3 from "../../assets/hotel-1.jpg";
+import g4 from "../../assets/hotel-panel.jpg";
 import g5 from "../../assets/gallery4.jpg";
 import g6 from "../../assets/gallery6.jpg";
 

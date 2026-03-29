@@ -29,10 +29,9 @@ export default function InfinityPoolSection() {
               <h2 className="pool-title">Infinity Pool</h2>
 
               <p className="pool-text">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                Donec malesuada lorem maximus mauris scelerisque, at rutrum
-                nulla dictum. Ut ac ligula sapien. Suspendisse cursus faucibus
-                finibus.
+                Enjoy breathtaking views while relaxing in our stunning infinity pool.
+                Perfect for unwinding, it combines luxury and serenity for an unforgettable experience.
+                Dive in and let the calm atmosphere rejuvenate your mind and body.
               </p>
 
               <div className="row g-4 justify-content-center pool-features">

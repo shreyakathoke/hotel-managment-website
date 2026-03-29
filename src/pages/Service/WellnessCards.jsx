@@ -8,23 +8,23 @@ const CARDS = [
   {
     title: "Wellness",
     desc:
-      "Malesuada lorem maximus\nmauris scelerisque, at rutrum\nnulla dictum. Ut ac ligula\nsapien. Suspendisse cursus\nfaucibus finibus.",
+      "Refresh your body and mind with our comprehensive wellness programs, featuring meditation, yoga, and personalized health routines.",
     img: wellnessImg,
     icon: "bi bi-sunrise",
   },
   {
     title: "Spa Center",
     desc:
-      "Malesuada lorem maximus\nmauris scelerisque, at rutrum\nnulla dictum. Ut ac ligula\nsapien. Suspendisse cursus\nfaucibus finibus.",
+      "Relax and rejuvenate with our luxurious spa treatments, including massages, aromatherapy, and skin revitalization therapies.",
     img: spaImg,
     icon: "bi bi-droplet",
   },
   {
     title: "Lounge Bar",
     desc:
-      "Malesuada lorem maximus\nmauris scelerisque, at rutrum\nnulla dictum. Ut ac ligula\nsapien. Suspendisse cursus\nfaucibus finibus.",
+      "Enjoy a sophisticated ambiance with handcrafted cocktails, fine wines, and light bites at our stylish lounge bar and skin revitalization therapies.",
     img: loungeImg,
-    icon: "bi bi-palm-tree",
+    icon: "bi bi-cup-straw",  // ✅ fixed icon
   },
 ];
 

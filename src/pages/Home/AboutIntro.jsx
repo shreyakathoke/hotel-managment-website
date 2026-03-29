@@ -39,9 +39,7 @@ export default function AboutIntro() {
             </h2>
 
             <p className="aboutIntro-text" data-aos="fade-up" data-aos-delay="500">
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Donec malesuada
-              lorem maximus mauris scelerisque, at rutrum nulla dictum. Ut ac ligula
-              sapien. Suspendisse cursus faucibus finibus.
+              Hotel Elite is a luxurious destination that combines comfort and elegance for every guest. It offers spacious rooms with modern amenities, ensuring a relaxing stay. The hotel features fine dining restaurants serving both local and international cuisine. Guests can enjoy recreational facilities like a swimming pool, spa, and fitness center. Its strategic location provides easy access to city attractions and business hubs. With exceptional service and attention to detail, Hotel Elite promises a memorable experience for travelers.
             </p>
 
             <div data-aos="fade-up" data-aos-delay="420">

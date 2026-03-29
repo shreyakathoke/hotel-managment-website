@@ -17,16 +17,16 @@ import g115 from "../../assets/g13.jpg";
 import g10 from "../../assets/room3.jpg";
 
 const gallery = [
-  { id: 1, src: g11, alt: "Luxury room" },
-  { id: 2, src: g13, alt: "Suite interior" },
-  { id: 3, src: g14, alt: "Bedroom view" },
-  { id: 4, src: g4, alt: "Resort balcony" },
-  { id: 5, src: g5, alt: "Resort lobby" },
-  { id: 6, src: g6, alt: "Night pool" },
-  { id: 7, src: g7, alt: "Outdoor fun" },
-  { id: 8, src: g8, alt: "Pool view" },
-  { id: 9, src: g115, alt: "Sunset resort" },
-  { id: 10, src: g10, alt: "Resort exterior" },
+  { id: 1, src: g11 },
+  { id: 2, src: g13 },
+  { id: 3, src: g14 },
+  { id: 4, src: g4 },
+  { id: 5, src: g5 },
+  { id: 6, src: g6 },
+  { id: 7, src: g7 },
+  { id: 8, src: g8},
+  { id: 9, src: g115 },
+  { id: 10, src: g10 },
 ];
 
 export default function GalleryMasonrySection() {

@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../../styles/auth.css";
 
+
 export default function Signup() {
   const navigate = useNavigate();
   const [show, setShow] = useState(false);

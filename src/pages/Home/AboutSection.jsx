@@ -26,21 +26,18 @@ export default function AboutSection() {
             </h2>
 
             <p className="about-para">
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-              Donec malesuada lorem maximus mauris scelerisque, at rutrum
-              nulla dictum. Ut ac ligula sapien. Suspendisse cursus faucibus
-              finibus.
+              Hotel Elite is a luxurious destination that combines comfort and elegance for every guest. It offers spacious rooms with modern amenities, ensuring a relaxing stay. The hotel features fine dining restaurants serving both local and international cuisine. Guests can enjoy recreational facilities like a swimming pool, spa, and fitness center. Its strategic location provides easy access to city attractions and business hubs. With exceptional service and attention to detail, Hotel Elite promises a memorable experience for travelers.
             </p>
 
             <div className="about-list mt-4 d-flex flex-column align-items-center">
               <div className="about-item">
                 <span className="about-check">✓</span>
-                <span>Donec malesuada lorem maximus mauris scelerisque</span>
+                <span>Relax in elegant rooms designed to make your stay unforgettable.</span>
               </div>
 
               <div className="about-item">
                 <span className="about-check">✓</span>
-                <span>Malesuada lorem maximus mauris scelerisque</span>
+                <span>Enjoy world-class dining experiences with a variety of culinary options.</span>
               </div>
             </div>
 
