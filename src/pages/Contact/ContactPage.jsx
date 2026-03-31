@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "../../styles/contactPage.css";
+import { createContactApi } from "../../api/api";
 
 export default function ContactPage() {
   const [form, setForm] = useState({
@@ -19,27 +20,28 @@ export default function ContactPage() {
     setStatus({ type: "", msg: "" });
   };
 
+  // ✅ FIXED SUBMIT (CONNECTED TO BACKEND)
   const onSubmit = async (e) => {
     e.preventDefault();
     setStatus({ type: "", msg: "" });
     setLoading(true);
 
     try {
-      const newMessage = {
-        id: "CT-" + Date.now(),
+      const payload = {
         name: form.name,
         email: form.email,
         phone: form.phone,
         subject: form.subject,
         message: form.message,
-        createdAt: new Date().toISOString(),
       };
 
-      const contacts = JSON.parse(localStorage.getItem("contacts")) || [];
-      contacts.push(newMessage);
-      localStorage.setItem("contacts", JSON.stringify(contacts));
+      const res = await createContactApi(payload);
 
-      setStatus({ type: "success", msg: "Message sent successfully ✅" });
+      setStatus({
+        type: "success",
+        msg: res.message || "Message sent successfully ✅",
+      });
+
       setForm({
         name: "",
         email: "",
@@ -47,10 +49,11 @@ export default function ContactPage() {
         subject: "",
         message: "",
       });
+
     } catch (err) {
       setStatus({
         type: "error",
-        msg: "Failed to send message. Please try again.",
+        msg: err.message || "Failed to send message. Please try again.",
       });
     } finally {
       setLoading(false);
@@ -76,13 +79,15 @@ export default function ContactPage() {
       <section className="contact-body">
         <div className="container py-5">
           <div className="row g-4">
+
+            {/* LEFT SIDE */}
             <div className="col-12 col-lg-5">
               <div className="contact-card">
                 <h3 className="contact-card-title">Get in touch</h3>
-                <p className="contact-card-text">
-                  Whether you’re planning a romantic getaway, family holiday, or
-                  business retreat — our team will respond quickly.
-                </p>
+                <p className="contact-hero2-sub mt-3">
+              We’re here to help you plan a perfect stay. Reach out for bookings,
+              events, or special requests.
+              </p>
 
                 <div className="contact-info">
                   <div className="info-item">
@@ -113,7 +118,9 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <div className="info-label">Email</div>
-                      <div className="info-value">support@eliteresort.com</div>
+                      <div className="info-value">
+                        support@eliteresort.com
+                      </div>
                     </div>
                   </div>
 
@@ -129,21 +136,10 @@ export default function ContactPage() {
                     </div>
                   </div>
                 </div>
-
-                <div className="contact-social mt-4">
-                  <a className="social-btn" href="#" aria-label="Instagram">
-                    <i className="bi bi-instagram" />
-                  </a>
-                  <a className="social-btn" href="#" aria-label="Facebook">
-                    <i className="bi bi-facebook" />
-                  </a>
-                  <a className="social-btn" href="#" aria-label="Twitter">
-                    <i className="bi bi-twitter-x" />
-                  </a>
-                </div>
               </div>
             </div>
 
+            {/* RIGHT SIDE FORM */}
             <div className="col-12 col-lg-7">
               <div className="contact-form-card">
                 <h3 className="contact-card-title">Send us a message</h3>
@@ -151,19 +147,29 @@ export default function ContactPage() {
                   Fill out the form and we’ll get back to you within 24 hours.
                 </p>
 
-                {status.msg ? (
-                  <div
-                    className={`alert ${
-                      status.type === "success" ? "alert-success" : "alert-danger"
-                    }`}
-                    role="alert"
-                  >
-                    {status.msg}
+                {/* ✅ POPUP */}
+                {status.msg && (
+                  <div className="custom-popup-overlay">
+                    <div className="custom-popup">
+                      <h4>
+                        {status.type === "success"
+                          ? "Success 🎉"
+                          : "Error ❌"}
+                      </h4>
+                      <p>{status.msg}</p>
+                      <button
+                        className="popup-btn"
+                        onClick={() => setStatus({ type: "", msg: "" })}
+                      >
+                        OK
+                      </button>
+                    </div>
                   </div>
-                ) : null}
+                )}
 
                 <form onSubmit={onSubmit}>
                   <div className="row g-3">
+
                     <div className="col-12 col-md-6">
                       <label className="form-label contact-label">Full Name</label>
                       <input
@@ -242,11 +248,13 @@ export default function ContactPage() {
                         {loading ? "Sending..." : "Send Message"}
                       </button>
                     </div>
+
                   </div>
                 </form>
               </div>
             </div>
 
+            {/* MAP */}
             <div className="col-12">
               <div className="contact-map">
                 <iframe
@@ -256,6 +264,7 @@ export default function ContactPage() {
                 />
               </div>
             </div>
+
           </div>
         </div>
       </section>

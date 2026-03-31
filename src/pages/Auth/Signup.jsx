@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../../styles/auth.css";
-
+import { signupApi } from "../../api/api"; // ✅ API IMPORT
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -26,7 +26,8 @@ export default function Signup() {
     setSuccess("");
   };
 
-  async function onSubmit(e) {
+  // ✅ FINAL FIXED SUBMIT FUNCTION (BACKEND CONNECTED)
+  const onSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -39,27 +40,12 @@ export default function Signup() {
     setLoading(true);
 
     try {
-      // Save user data in localStorage instead of backend
-      const users = JSON.parse(localStorage.getItem("users")) || [];
+      const res = await signupApi(form); // 🔥 CALL BACKEND
 
-      const alreadyExists = users.some(
-        (user) => user.email.toLowerCase() === form.email.toLowerCase()
-      );
-
-      if (alreadyExists) {
-        setError("User already exists with this email.");
-        setLoading(false);
+      if (res.error) {
+        setError(res.error);
         return;
       }
-
-      const newUser = {
-        name: form.name,
-        email: form.email,
-        password: form.password,
-      };
-
-      users.push(newUser);
-      localStorage.setItem("users", JSON.stringify(users));
 
       setSuccess("Account created successfully ✅ Redirecting to login...");
 
@@ -68,12 +54,14 @@ export default function Signup() {
       setTimeout(() => {
         navigate("/login", { replace: true });
       }, 800);
+
     } catch (err) {
-      setError("Signup failed. Please try again.");
+      console.error(err);
+      setError("Signup failed. Server error.");
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="auth-page auth-page-center">
@@ -161,13 +149,14 @@ export default function Signup() {
                       type="button"
                       className="auth-eye"
                       onClick={() => setShow((p) => !p)}
-                      aria-label={show ? "Hide password" : "Show password"}
                       disabled={loading}
                     >
                       <i className={`bi ${show ? "bi-eye-slash" : "bi-eye"}`} />
                     </button>
                   </div>
-                  <div className="auth-help mt-2">Use at least 6 characters.</div>
+                  <div className="auth-help mt-2">
+                    Use at least 6 characters.
+                  </div>
                 </div>
 
                 <button

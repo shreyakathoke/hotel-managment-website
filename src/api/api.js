@@ -1,98 +1,161 @@
 const API_URL = "https://web-production-d78058.up.railway.app";
 
-export async function signupUser(data) {
+// ================= COMMON HANDLER =================
+const handleResponse = async (res) => {
+  const data = await res.json();
+  if (!res.ok) throw data;
+  return data;
+};
+
+// ================= AUTH =================
+export const signupApi = async (data) => {
   const res = await fetch(`${API_URL}/signup`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  return res.json();
-}
+  return handleResponse(res);
+};
 
-export async function loginUser(data) {
+export const loginApi = async (data) => {
   const res = await fetch(`${API_URL}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  return res.json();
-}
+  return handleResponse(res);
+};
 
-export async function getProfile(email) {
-  const res = await fetch(`${API_URL}/profile/${email}`);
-  return res.json();
-}
-
-export async function saveProfile(data) {
+// ================= PROFILE =================
+export const saveProfileApi = async (data) => {
   const res = await fetch(`${API_URL}/profile`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  return res.json();
-}
+  return handleResponse(res);
+};
 
-// Rooms
-export async function getRooms() {
+export const getProfileApi = async (email) => {
+  const res = await fetch(`${API_URL}/profile/${email}`);
+  return handleResponse(res);
+};
+
+// ================= USERS =================
+export const deleteUserApi = async (email) => {
+  const res = await fetch(`${API_URL}/users/${email}`, { method: "DELETE" });
+  return handleResponse(res);
+};
+
+// ================= ROOMS =================
+export const getRoomsApi = async () => {
   const res = await fetch(`${API_URL}/rooms`);
-  return res.json();
-}
+  return handleResponse(res);
+};
 
-export async function getRoom(roomId) {
+export const getRoomApi = async (roomId) => {
   const res = await fetch(`${API_URL}/rooms/${roomId}`);
-  return res.json();
-}
+  return handleResponse(res);
+};
 
-// Booking
-export async function createBooking(data) {
+export const addRoomApi = async (data, isFormData = false) => {
+  const res = await fetch(`${API_URL}/rooms`, {
+    method: "POST",
+    headers: isFormData ? {} : { "Content-Type": "application/json" },
+    body: isFormData ? data : JSON.stringify(data),
+  });
+  return handleResponse(res);
+};
+
+export const updateRoomApi = async (roomId, data) => {
+  const res = await fetch(`${API_URL}/rooms/${roomId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+};
+
+export const deleteRoomApi = async (roomId) => {
+  const res = await fetch(`${API_URL}/rooms/${roomId}`, { method: "DELETE" });
+  return handleResponse(res);
+};
+
+// ================= BOOKINGS =================
+export const createBookingApi = async (data) => {
   const res = await fetch(`${API_URL}/booking`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  return res.json();
-}
+  return handleResponse(res);
+};
 
-export async function getBookings(email) {
-  const res = await fetch(`${API_URL}/booking/${email}`);
-  return res.json();
-}
-
-export async function cancelBooking(bookingId) {
+export const cancelBookingApi = async (bookingId) => {
   const res = await fetch(`${API_URL}/booking/cancel`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ bookingId }),
   });
-  return res.json();
-}
+  return handleResponse(res);
+};
 
-// Payment
-export async function createPayment(data) {
+export const getAllBookingsApi = async () => {
+  const res = await fetch(`${API_URL}/booking`);
+  return handleResponse(res);
+};
+
+// ================= PAYMENTS =================
+export const createPaymentApi = async (data) => {
   const res = await fetch(`${API_URL}/payments`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  return res.json();
-}
+  return handleResponse(res);
+};
 
-export async function getPayment(bookingId) {
+export const getPaymentApi = async (bookingId) => {
   const res = await fetch(`${API_URL}/payments/${bookingId}`);
-  return res.json();
-}
+  return handleResponse(res);
+};
 
-// Contacts
-export async function sendContact(data) {
+export const cancelPaymentApi = async (paymentId) => {
+  const res = await fetch(`${API_URL}/payments/${paymentId}`, { method: "PUT" });
+  return handleResponse(res);
+};
+
+// ================= CONTACTS =================
+export const createContactApi = async (data) => {
   const res = await fetch(`${API_URL}/contacts`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  return res.json();
-}
+  return handleResponse(res);
+};
 
-export async function getContacts() {
+export const getContactsApi = async () => {
   const res = await fetch(`${API_URL}/contacts`);
-  return res.json();
-}
+  return handleResponse(res);
+};
+
+export const getContactByIdApi = async (id) => {
+  const res = await fetch(`${API_URL}/contacts/${id}`);
+  return handleResponse(res);
+};
+
+export const deleteContactApi = async (id) => {
+  const res = await fetch(`${API_URL}/contacts/${id}`, { method: "DELETE" });
+  return handleResponse(res);
+};
+
+// ================= ADMIN =================
+export const adminLoginApi = async (data) => {
+  const res = await fetch(`${API_URL}/admin/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+};

@@ -1,11 +1,12 @@
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import "../../styles/rooms.css";
 
 import room1 from "../../assets/room1.jpg";
 import room2 from "../../assets/g6.jpg";
-import secondroom from "../../assets/g14.jpg"; // ✅ fixed extension
+import secondroom from "../../assets/g14.jpg";
 import thirdroom from "../../assets/g3.jpg";
 import room5 from "../../assets/g4.jpg";
 import room6 from "../../assets/g6.jpg";
@@ -56,6 +57,8 @@ const rooms = [
 ];
 
 export default function RoomsSection() {
+  const navigate = useNavigate();
+
   useEffect(() => {
     AOS.init({
       duration: 900,
@@ -86,8 +89,6 @@ export default function RoomsSection() {
                 <div
                   className="room-img"
                   style={{ backgroundImage: `url(${room.img})` }}
-                  role="img"
-                  aria-label={room.title}
                 />
 
                 <div className="room-overlay">
@@ -95,7 +96,12 @@ export default function RoomsSection() {
                   <h3 className="room-title">{room.title}</h3>
                   <p className="room-desc">{room.desc}</p>
 
-                  <button className="room-btn" type="button">
+                  <button
+                    className="room-btn"
+                    onClick={() =>
+                      navigate(`/room/${room.id}`, { state: room })
+                    }
+                  >
                     Book Room
                   </button>
                 </div>

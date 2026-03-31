@@ -1,86 +1,68 @@
+// src/pages/rooms/RoomsList.jsx
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import "../../styles/roomListPage.css";
 
-// ✅ local images
+import { getRoomsApi } from "../../api/api";
+
+// Fallback static images
 import room1 from "../../assets/room1.jpg";
-import g3 from "../../assets/g3.jpg";
-import g4 from "../../assets/g4.jpg";
-import g6 from "../../assets/g6.jpg";
+import room2 from "../../assets/g6.jpg";
+import secondroom from "../../assets/g14.jpg";
+import thirdroom from "../../assets/g3.jpg";
+import room5 from "../../assets/g4.jpg";
+import room6 from "../../assets/g6.jpg";
 
 const FILTERS = ["All", "Deluxe", "Suite", "Standard", "Single", "Family", "Luxury"];
 
-const formatUSD = (n) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(Number(n || 0));
-
 export default function RoomsList() {
   const navigate = useNavigate();
-
   const [query, setQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
-  const [activeRoom, setActiveRoom] = useState(null);
-
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Initialize AOS animation
   useEffect(() => {
     AOS.init({ duration: 900, once: true });
   }, []);
 
-  // ✅ LOCAL ROOMS DATA (NO BACKEND)
+  // Fetch rooms from backend
   useEffect(() => {
-    const localRooms = [
-      {
-        roomId: "R1",
-        roomNumber: "101",
-        type: "Deluxe",
-        pricePerNight: 3000,
-        capacity: 2,
-        available: true,
-        cover: room1,
-        images: [room1, g3, g4],
-        description: "Luxury deluxe room with sea view.",
-        features: ["Wi-Fi", "AC", "Breakfast"],
-        rating: 4.5,
-      },
-      {
-        roomId: "R2",
-        roomNumber: "102",
-        type: "Suite",
-        pricePerNight: 5000,
-        capacity: 4,
-        available: true,
-        cover: g3,
-        images: [g3, g4, g6],
-        description: "Spacious suite for family stay.",
-        features: ["Wi-Fi", "AC", "Room Service"],
-        rating: 4.8,
-      },
-      {
-        roomId: "R3",
-        roomNumber: "103",
-        type: "Standard",
-        pricePerNight: 2000,
-        capacity: 2,
-        available: false,
-        cover: g4,
-        images: [g4, g6, room1],
-        description: "Comfortable standard room.",
-        features: ["Wi-Fi", "Fan"],
-        rating: 4.2,
-      },
-    ];
+    const fetchRooms = async () => {
+      try {
+        const data = await getRoomsApi();
+        const fallbackImages = [room1, room2, secondroom, thirdroom, room5, room6];
 
-    setRooms(localRooms);
-    setLoading(false);
+        const formattedRooms = data.map((r, idx) => {
+          const imageUrl =
+            r.imageUrl && r.imageUrl.startsWith("http")
+              ? r.imageUrl
+              : fallbackImages[idx % fallbackImages.length];
+
+          return {
+            ...r,
+            cover: imageUrl,
+            images: [imageUrl, room2, secondroom, thirdroom],
+            features: ["Wi-Fi", "AC", "Breakfast", "TV"],
+            rating: 4.5,
+          };
+        });
+
+        setRooms(formattedRooms);
+      } catch (err) {
+        console.error("Error fetching rooms:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRooms();
   }, []);
 
+  // Filter rooms based on query & active filter
   const filteredRooms = useMemo(() => {
     const q = query.toLowerCase();
     const f = activeFilter.toLowerCase();
@@ -89,35 +71,32 @@ export default function RoomsList() {
       const filterOk = activeFilter === "All" || r.type.toLowerCase().includes(f);
       const queryOk =
         !q ||
-        `${r.roomNumber} ${r.type} ${r.available ? "available" : "unavailable"}`
-          .toLowerCase()
-          .includes(q);
-
+        `${r.roomNumber} ${r.type} ${r.available ? "available" : "unavailable"}`.toLowerCase().includes(q);
       return filterOk && queryOk;
     });
   }, [rooms, query, activeFilter]);
 
+  // Booking handler
   const handleBooking = (room) => {
     const token = localStorage.getItem("token");
-
     if (!token) {
       navigate("/login");
       return;
     }
-
     navigate(`/booking/${room.roomId}`);
   };
 
   return (
-    <main className="rl-page">
-      <section className="rl-hero text-center">
-        <h1>Room List</h1>
+    <main className="rl-page" style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
+      <section className="rl-hero text-center py-5">
+        <h1 className="text-dark">Room List</h1>
 
         <input
           className="form-control mt-3"
-          placeholder="Search..."
+          placeholder="Search rooms..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          style={{ maxWidth: "400px", margin: "10px auto" }}
         />
 
         <div className="mt-3">
@@ -140,17 +119,41 @@ export default function RoomsList() {
           <div className="row g-4">
             {filteredRooms.map((room) => (
               <div key={room.roomId} className="col-md-4">
-                <div className="card">
-                  <img src={room.cover} className="card-img-top" />
+                <div className="card h-100 shadow-sm" data-aos="fade-up">
+                  <img
+                    src={room.cover}
+                    className="card-img-top"
+                    alt="room"
+                    onError={(e) => {
+                      const fallbackImages = [room1, room2, secondroom, thirdroom, room5, room6];
+                      e.target.src = fallbackImages[Math.floor(Math.random() * fallbackImages.length)];
+                    }}
+                    style={{ height: "220px", objectFit: "cover" }}
+                  />
+                  <div className="card-body d-flex flex-column">
+                    <h5>{room.type} Room</h5>
+                    <p className="mb-1">Room: {room.roomNumber}</p>
+                    <p className="mb-1">Price: ₹{room.pricePerNight}</p>
+                    <p className="mb-2">{room.available ? "Available" : "Not Available"}</p>
 
-                  <div className="card-body">
-                    <h5>{room.type}</h5>
-                    <p>Room: {room.roomNumber}</p>
-                    <p>Price: ₹{room.pricePerNight}</p>
-                    <p>{room.available ? "Available" : "Not Available"}</p>
+                    <div className="mb-2">
+                      {room.features.map((f, idx) => (
+                        <span key={idx} className="badge bg-secondary me-1">
+                          {f}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="mb-2">
+                      <span className="text-warning">
+                        {"★".repeat(Math.floor(room.rating))}
+                        {"☆".repeat(5 - Math.floor(room.rating))}
+                      </span>
+                      <span className="ms-2">{room.rating.toFixed(1)}</span>
+                    </div>
 
                     <button
-                      className="btn btn-primary"
+                      className="btn btn-primary mt-auto"
                       disabled={!room.available}
                       onClick={() => handleBooking(room)}
                     >
