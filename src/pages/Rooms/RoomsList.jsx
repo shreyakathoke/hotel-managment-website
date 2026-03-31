@@ -1,4 +1,4 @@
-// src/pages/rooms/RoomsList.jsx
+// src/pages/Rooms/RoomsList.jsx
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AOS from "aos";
@@ -7,7 +7,7 @@ import "../../styles/roomListPage.css";
 
 import { getRoomsApi } from "../../api/api";
 
-// Fallback static images
+// Fallback images
 import room1 from "../../assets/room1.jpg";
 import room2 from "../../assets/g6.jpg";
 import secondroom from "../../assets/g14.jpg";
@@ -24,12 +24,10 @@ export default function RoomsList() {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Initialize AOS animation
   useEffect(() => {
     AOS.init({ duration: 900, once: true });
   }, []);
 
-  // Fetch rooms from backend
   useEffect(() => {
     const fetchRooms = async () => {
       try {
@@ -62,7 +60,6 @@ export default function RoomsList() {
     fetchRooms();
   }, []);
 
-  // Filter rooms based on query & active filter
   const filteredRooms = useMemo(() => {
     const q = query.toLowerCase();
     const f = activeFilter.toLowerCase();
@@ -76,11 +73,11 @@ export default function RoomsList() {
     });
   }, [rooms, query, activeFilter]);
 
-  // Booking handler
   const handleBooking = (room) => {
     const token = localStorage.getItem("token");
     if (!token) {
-      navigate("/login");
+      // redirect to login with "from" state
+      navigate("/login", { state: { from: `/booking/${room.roomId}` } });
       return;
     }
     navigate(`/booking/${room.roomId}`);
@@ -103,6 +100,7 @@ export default function RoomsList() {
           {FILTERS.map((f) => (
             <button
               key={f}
+              type="button"
               className={`btn m-1 ${activeFilter === f ? "btn-primary" : "btn-outline-secondary"}`}
               onClick={() => setActiveFilter(f)}
             >
@@ -153,6 +151,7 @@ export default function RoomsList() {
                     </div>
 
                     <button
+                      type="button"
                       className="btn btn-primary mt-auto"
                       disabled={!room.available}
                       onClick={() => handleBooking(room)}

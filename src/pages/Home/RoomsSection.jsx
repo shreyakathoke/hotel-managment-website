@@ -99,7 +99,7 @@ export default function RoomsSection() {
                   <button
                     className="room-btn"
                     onClick={() =>
-                      navigate(`/room/${room.id}`, { state: room })
+                      navigate(`/rooms/${room.id}`, { state: room })
                     }
                   >
                     Book Room

@@ -20,40 +20,22 @@ export default function ContactPage() {
     setStatus({ type: "", msg: "" });
   };
 
-  // ✅ FIXED SUBMIT (CONNECTED TO BACKEND)
   const onSubmit = async (e) => {
     e.preventDefault();
     setStatus({ type: "", msg: "" });
     setLoading(true);
 
     try {
-      const payload = {
-        name: form.name,
-        email: form.email,
-        phone: form.phone,
-        subject: form.subject,
-        message: form.message,
-      };
-
-      const res = await createContactApi(payload);
-
+      const res = await createContactApi(form);
       setStatus({
         type: "success",
         msg: res.message || "Message sent successfully ✅",
       });
-
-      setForm({
-        name: "",
-        email: "",
-        phone: "",
-        subject: "",
-        message: "",
-      });
-
+      setForm({ name: "", email: "", phone: "", subject: "", message: "" });
     } catch (err) {
       setStatus({
         type: "error",
-        msg: err.message || "Failed to send message. Please try again.",
+        msg: err.message || err.error || "Failed to send message. Please try again.",
       });
     } finally {
       setLoading(false);
@@ -85,9 +67,9 @@ export default function ContactPage() {
               <div className="contact-card">
                 <h3 className="contact-card-title">Get in touch</h3>
                 <p className="contact-hero2-sub mt-3">
-              We’re here to help you plan a perfect stay. Reach out for bookings,
-              events, or special requests.
-              </p>
+                  We’re here to help you plan a perfect stay. Reach out for bookings,
+                  events, or special requests.
+                </p>
 
                 <div className="contact-info">
                   <div className="info-item">

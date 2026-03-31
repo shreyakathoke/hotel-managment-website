@@ -1,33 +1,26 @@
+// src/pages/Auth/Login.jsx
 import { useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import "../../styles/auth.css";
+import { loginApi } from "../../api/api"; // make sure this points to your backend
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
-
+  const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
 
-  const canSubmit = useMemo(() => {
-    return form.email.trim() !== "" && form.password.trim().length >= 6;
-  }, [form.email, form.password]);
+  const canSubmit = useMemo(() => form.email.trim() !== "" && form.password.trim().length >= 6, [form]);
 
   const onChange = (e) => {
-    setForm((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     setError("");
   };
 
-  async function onSubmit(e) {
+  const onSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -37,37 +30,33 @@ export default function Login() {
     }
 
     setLoading(true);
-
     try {
-      const users = JSON.parse(localStorage.getItem("users")) || [];
+      // Call backend login API
+      const data = await loginApi({ email: form.email, password: form.password });
 
-      const matchedUser = users.find(
-        (user) =>
-          user.email.toLowerCase() === form.email.trim().toLowerCase() &&
-          user.password === form.password
-      );
-
-      if (!matchedUser) {
-        setError("Invalid email or password.");
+      if (!data?.token) {
+        setError(data?.message || "Invalid email or password.");
         setLoading(false);
         return;
       }
 
-      const fakeToken = "local-demo-token-" + Date.now();
-
-      localStorage.setItem("token", fakeToken);
+      // Save user info
+      localStorage.setItem("token", data.token);
       localStorage.setItem("user_auth", "true");
-      localStorage.setItem("user_name", matchedUser.name || "");
-      localStorage.setItem("user_email", matchedUser.email || form.email.trim());
-      localStorage.setItem("user_role", "USER");
+      localStorage.setItem("user_name", data.name || "");
+      localStorage.setItem("user_email", data.email || form.email.trim());
+      localStorage.setItem("user_role", data.role || "USER");
 
-      navigate("/user-profile", { replace: true });
+      // Redirect to previous page if exists, else profile
+      const redirectTo = location.state?.from || "/user-profile";
+      navigate(redirectTo, { replace: true });
     } catch (err) {
+      console.error(err);
       setError("Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="auth-page auth-page-center">
@@ -79,15 +68,10 @@ export default function Login() {
                 <div className="auth-badge-sm mx-auto">
                   <i className="bi bi-gem" />
                 </div>
-
                 <div className="auth-kicker mt-3">Elite</div>
                 <h2 className="auth-title">Welcome Back</h2>
-
                 <p className="auth-subtitle">
-                  Don’t have an account?{" "}
-                  <Link to="/signup" className="auth-link">
-                    Create one
-                  </Link>
+                  Don’t have an account? <Link to="/signup" className="auth-link">Create one</Link>
                 </p>
               </div>
 
@@ -131,13 +115,7 @@ export default function Login() {
                       required
                       minLength={6}
                     />
-
-                    <button
-                      type="button"
-                      className="auth-eye"
-                      onClick={() => setShow((prev) => !prev)}
-                      aria-label={show ? "Hide password" : "Show password"}
-                    >
+                    <button type="button" className="auth-eye" onClick={() => setShow((prev) => !prev)}>
                       <i className={`bi ${show ? "bi-eye-slash" : "bi-eye"}`}></i>
                     </button>
                   </div>
@@ -145,50 +123,31 @@ export default function Login() {
 
                 <div className="d-flex justify-content-between align-items-center mb-4">
                   <div className="form-check">
-                    <input
-                      type="checkbox"
-                      className="form-check-input"
-                      id="remember"
-                    />
-                    <label className="form-check-label" htmlFor="remember">
-                      Remember me
-                    </label>
+                    <input type="checkbox" className="form-check-input" id="remember" />
+                    <label className="form-check-label" htmlFor="remember">Remember me</label>
                   </div>
-
-                  <Link to="/forgot" className="auth-link small">
-                    Forgot password?
-                  </Link>
+                  <Link to="/forgot" className="auth-link small">Forgot password?</Link>
                 </div>
 
-                <button
-                  type="submit"
-                  className="btn btn-primary w-100 auth-btn"
-                  disabled={loading || !canSubmit}
-                >
+                <button type="submit" className="btn btn-primary w-100 auth-btn" disabled={loading || !canSubmit}>
                   {loading ? (
                     <>
                       <span className="spinner-border spinner-border-sm me-2"></span>
                       Signing in...
                     </>
                   ) : (
-                    <>
-                      Login <i className="bi bi-arrow-right ms-1"></i>
-                    </>
+                    <>Login <i className="bi bi-arrow-right ms-1"></i></>
                   )}
                 </button>
 
                 <div className="auth-foot mt-4 text-center">
-                  By signing in, you agree to our{" "}
-                  <span className="auth-muted-link">Terms</span> and{" "}
-                  <span className="auth-muted-link">Privacy Policy</span>.
+                  By signing in, you agree to our <span className="auth-muted-link">Terms</span> and <span className="auth-muted-link">Privacy Policy</span>.
                 </div>
               </form>
             </div>
 
             <div className="text-center mt-3">
-              <Link to="/" className="auth-link small">
-                ← Back to Home
-              </Link>
+              <Link to="/" className="auth-link small">← Back to Home</Link>
             </div>
           </div>
         </div>

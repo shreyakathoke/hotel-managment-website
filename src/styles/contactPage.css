@@ -20,7 +20,7 @@
 .contact-hero2-bg {
   position: absolute;
   inset: 0;
-  background-image: url("/public/aboutbackground.jpg"); /* put in public/contact-bg.jpg */
+  background-image: url("../assets/aboutbackground.jpg"); /* put in public/contact-bg.jpg */
   background-size: cover;
   background-position: center;
   background-attachment: fixed;

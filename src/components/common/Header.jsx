@@ -41,8 +41,7 @@ export default function Header() {
 
           {/* Desktop CTA */}
           <div className="d-none d-lg-flex ms-auto order-lg-3">
-            {/* ✅ make sure /signup route exists */}
-            <NavLink to="/about" className="header-cta-btn">
+            <NavLink to="/signup" className="header-cta-btn">
               <span className="btn-text text-white">Make A Reservation</span>
             </NavLink>
           </div>
@@ -71,7 +70,7 @@ export default function Header() {
                     className={({ isActive }) =>
                       `nav-link ${isActive ? "active nav-pill" : ""}`
                     }
-                    end={item.path === "/"} // ✅ important for home exact match
+                    end={item.path === "/"} 
                   >
                     {item.name}
                   </NavLink>
@@ -81,7 +80,7 @@ export default function Header() {
 
             {/* Mobile CTA */}
             <div className="mt-3 text-center d-lg-none">
-              <NavLink to="/about" onClick={closeMenu} className="header-cta-btn w-100">
+              <NavLink to="/signup" onClick={closeMenu} className="header-cta-btn w-100">
                 <span className="btn-text text-white">Make A Reservation</span>
               </NavLink>
             </div>

@@ -1,14 +1,7 @@
 /* ================================
    Font: FuturaLT-Book (500)
 ================================ */
-@font-face {
-  font-family: "FuturaLT";
-  src: url("../../assets/fonts/FuturaLT-Book.woff2") format("woff2"),
-       url("../../assets/fonts/FuturaLT-Book.woff") format("woff");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
+
 
 /* ✅ Instead of body padding, use spacer under fixed navbar */
 .header-spacer {

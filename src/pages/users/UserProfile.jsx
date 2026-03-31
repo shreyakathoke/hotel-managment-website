@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../styles/userprofiles.css";
+import "../../styles/userprofiles.css"; // You can update/add more styles in this CSS
 
 export default function UserProfilePage() {
   const navigate = useNavigate();
@@ -38,23 +38,19 @@ export default function UserProfilePage() {
 
   const handleFile = (selectedFile) => {
     if (!selectedFile) return;
-
     if (!selectedFile.type?.startsWith("image/")) {
       alert("Only image allowed");
       return;
     }
-
     if (selectedFile.size > 2 * 1024 * 1024) {
       alert("Max size 2MB");
       return;
     }
 
     if (preview) URL.revokeObjectURL(preview);
-
     setFile(selectedFile);
     const url = URL.createObjectURL(selectedFile);
     setPreview(url);
-
     setForm((p) => ({ ...p, photoUrl: url }));
   };
 
@@ -79,14 +75,14 @@ export default function UserProfilePage() {
     setErrMsg("");
 
     const token = localStorage.getItem("token");
-    if (!token) return setErrMsg("Login first");
+    if (!token) return setErrMsg("Please login first");
 
     if (!form.phone || !form.address || !form.idType || !form.idNumber) {
-      return setErrMsg("Fill all fields");
+      return setErrMsg("Please fill all fields");
     }
 
     if (!form.photoUrl) {
-      return setErrMsg("Upload image");
+      return setErrMsg("Please upload your photo");
     }
 
     setSubmitting(true);
@@ -96,14 +92,10 @@ export default function UserProfilePage() {
         ...form,
         idProof: `${form.idType}-${form.idNumber}`,
       };
-
       localStorage.setItem("user_profile", JSON.stringify(profile));
 
       setMsg("Profile saved successfully ✅");
-
-      setTimeout(() => {
-        navigate("/rooms");
-      }, 1000);
+      setTimeout(() => navigate("/rooms"), 1500);
     } catch (err) {
       setErrMsg("Failed to save profile");
     } finally {
@@ -112,63 +104,111 @@ export default function UserProfilePage() {
   };
 
   return (
-    <div className="profile-wrap">
-      <div className="container py-4">
-        <div className="card p-4">
-          <h3>Profile Details</h3>
+    <div className="profile-wrap py-5" style={{ backgroundColor: "#f5f6fa", minHeight: "100vh" }}>
+      <div className="container">
+        <div className="card shadow-sm border-0 p-4 p-md-5 mx-auto" style={{ maxWidth: 600 }}>
+          <h3 className="mb-4 text-center">Profile Details</h3>
 
           {msg && <div className="alert alert-success">{msg}</div>}
           {errMsg && <div className="alert alert-danger">{errMsg}</div>}
 
           <form onSubmit={onSubmit}>
-            <input value={form.name} disabled className="form-control mb-2" />
-            <input value={form.email} disabled className="form-control mb-2" />
+            <div className="mb-3">
+              <label className="form-label">Full Name</label>
+              <input
+                value={form.name}
+                disabled
+                className="form-control"
+              />
+            </div>
 
-            <input
-              name="phone"
-              placeholder="Phone"
-              value={form.phone}
-              onChange={onChange}
-              className="form-control mb-2"
-            />
+            <div className="mb-3">
+              <label className="form-label">Email</label>
+              <input
+                value={form.email}
+                disabled
+                className="form-control"
+              />
+            </div>
 
-            <input
-              name="address"
-              placeholder="Address"
-              value={form.address}
-              onChange={onChange}
-              className="form-control mb-2"
-            />
+            <div className="mb-3">
+              <label className="form-label">Phone</label>
+              <input
+                name="phone"
+                placeholder="Enter phone number"
+                value={form.phone}
+                onChange={onChange}
+                className="form-control"
+              />
+            </div>
 
-            <select
-              name="idType"
-              value={form.idType}
-              onChange={onChange}
-              className="form-control mb-2"
+            <div className="mb-3">
+              <label className="form-label">Address</label>
+              <input
+                name="address"
+                placeholder="Enter address"
+                value={form.address}
+                onChange={onChange}
+                className="form-control"
+              />
+            </div>
+
+            <div className="row mb-3">
+              <div className="col-md-6">
+                <label className="form-label">ID Type</label>
+                <select
+                  name="idType"
+                  value={form.idType}
+                  onChange={onChange}
+                  className="form-select"
+                >
+                  <option value="">Select ID Type</option>
+                  <option value="aadhaar">Aadhaar</option>
+                  <option value="pan">PAN</option>
+                </select>
+              </div>
+
+              <div className="col-md-6">
+                <label className="form-label">ID Number</label>
+                <input
+                  name="idNumber"
+                  placeholder="Enter ID number"
+                  value={form.idNumber}
+                  onChange={onChange}
+                  className="form-control"
+                />
+              </div>
+            </div>
+
+            <div
+              className={`mb-3 p-3 border rounded text-center ${dragOver ? "border-primary" : "border-secondary"}`}
+              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={onDrop}
             >
-              <option value="">Select ID</option>
-              <option value="aadhaar">Aadhaar</option>
-              <option value="pan">PAN</option>
-            </select>
+              <p className="mb-2">Upload your photo</p>
+              <button type="button" className="btn btn-outline-primary btn-sm mb-2" onClick={onBrowse}>
+                Browse File
+              </button>
+              <input
+                ref={fileRef}
+                type="file"
+                hidden
+                onChange={(e) => handleFile(e.target.files[0])}
+              />
+              {preview && (
+                <div className="mt-3">
+                  <img src={preview} alt="Preview" style={{ width: 120, borderRadius: "8px" }} />
+                  <div>
+                    <button type="button" className="btn btn-sm btn-danger mt-2" onClick={removeFile}>
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
 
-            <input
-              name="idNumber"
-              placeholder="ID Number"
-              value={form.idNumber}
-              onChange={onChange}
-              className="form-control mb-2"
-            />
-
-            <input
-              ref={fileRef}
-              type="file"
-              className="form-control mb-2"
-              onChange={(e) => handleFile(e.target.files[0])}
-            />
-
-            {preview && <img src={preview} width="100" />}
-
-            <button className="btn btn-primary mt-3">
+            <button className="btn btn-primary w-100 mt-3">
               {submitting ? "Saving..." : "Save Profile"}
             </button>
           </form>

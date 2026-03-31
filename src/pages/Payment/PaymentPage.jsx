@@ -1,6 +1,8 @@
+// src/pages/Payment/PaymentPage.jsx
 import React, { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "../../styles/payment.css";
+import { createPaymentApi, cancelPaymentApi } from "../../api/api"; // backend API
 
 const METHODS = [
   { key: "UPI", icon: "bi-upc-scan", label: "UPI" },
@@ -22,14 +24,12 @@ export default function PaymentPage() {
 
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
-
   const [payment, setPayment] = useState(null);
 
   const canPay = useMemo(() => {
     return Boolean(bookingId && method && transactionId.trim().length >= 6);
   }, [bookingId, method, transactionId]);
 
-  // ✅ LOCAL PAYMENT (NO BACKEND)
   const onPay = async (e) => {
     e.preventDefault();
     setError("");
@@ -42,59 +42,65 @@ export default function PaymentPage() {
     setLoading(true);
 
     try {
-      const paymentId = "PAY-" + Date.now();
-
-      const newPayment = {
-        paymentId,
+      // call backend API
+      const paymentData = {
         bookingId,
         method,
         transactionId: transactionId.trim(),
-        amount: 5000, // demo amount
+      };
+      const response = await createPaymentApi(paymentData);
+
+      // response from backend
+      const newPayment = response.payment || {
+        paymentId: "PAY-" + Date.now(),
+        bookingId,
+        method,
+        transactionId: transactionId.trim(),
+        amount: response.amount || 5000,
         status: "SUCCESS",
         paidAt: new Date().toLocaleString(),
       };
 
-      // Save payment
+      setPayment(newPayment);
+
+      // Show success message
+      setSuccessMsg("Payment successful ✅");
+
+      // Save locally if needed
       const payments = JSON.parse(localStorage.getItem("payments")) || [];
       payments.push(newPayment);
       localStorage.setItem("payments", JSON.stringify(payments));
 
-      // Update booking status
-      const bookings = JSON.parse(localStorage.getItem("bookings")) || [];
-      const updatedBookings = bookings.map((b) =>
-        b.bookingId === bookingId ? { ...b, paymentStatus: "PAID" } : b
-      );
-      localStorage.setItem("bookings", JSON.stringify(updatedBookings));
+      // After 1s show alert then redirect
+      setTimeout(() => {
+        alert("Payment Successful!");
+        navigate("/rooms"); // redirect to rooms
+      }, 500);
 
-      setPayment(newPayment);
-      setSuccessMsg("Payment successful ✅");
     } catch (err) {
-      setError("Payment failed");
+      console.error(err);
+      setError(err.message || "Payment failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  // ✅ CANCEL PAYMENT
-  const onCancelPayment = () => {
+  const onCancelPayment = async () => {
     if (!payment?.paymentId) return;
-
     setCanceling(true);
+    setError("");
 
-    const payments = JSON.parse(localStorage.getItem("payments")) || [];
+    try {
+      await cancelPaymentApi(payment.paymentId);
 
-    const updated = payments.map((p) =>
-      p.paymentId === payment.paymentId
-        ? { ...p, status: "CANCELLED" }
-        : p
-    );
-
-    localStorage.setItem("payments", JSON.stringify(updated));
-
-    setPayment((p) => ({ ...p, status: "CANCELLED" }));
-
-    setSuccessMsg("Payment cancelled ✅");
-    setCanceling(false);
+      setPayment((p) => ({ ...p, status: "CANCELLED" }));
+      setSuccessMsg("Payment cancelled ✅");
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Failed to cancel payment.");
+    } finally {
+      setCanceling(false);
+    }
   };
 
   return (
@@ -127,9 +133,7 @@ export default function PaymentPage() {
                     <div key={m.key} className="col-md-4">
                       <button
                         type="button"
-                        className={`btn w-100 ${
-                          method === m.key ? "btn-primary" : "btn-outline-secondary"
-                        }`}
+                        className={`btn w-100 ${method === m.key ? "btn-primary" : "btn-outline-secondary"}`}
                         onClick={() => setMethod(m.key)}
                       >
                         {m.label}
@@ -173,7 +177,6 @@ export default function PaymentPage() {
           <div className="col-lg-5">
             <div className="card p-4">
               <h5>Summary</h5>
-
               <p>Booking: {bookingId}</p>
               <p>Method: {method}</p>
               <p>Txn: {transactionId || "-"}</p>
