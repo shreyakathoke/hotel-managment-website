@@ -1,4 +1,4 @@
-const API_URL = "https://hotel-managment-backend-production.up.railway.app/";
+const API_URL = "https://hotel-managment-backend-production.up.railway.app";
 
 // ================= COMMON HANDLER =================
 const handleResponse = async (res) => {
