@@ -4,8 +4,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import "../../styles/booking.css";
 import { createBookingApi, cancelBookingApi } from "../../api/api";
 
-// Helper to calculate number of nights
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
+// Helper: calculate nights
 function daysBetween(a, b) {
+  if (!a || !b) return 0;
   const d1 = new Date(a);
   const d2 = new Date(b);
   const ms = d2.getTime() - d1.getTime();
@@ -16,7 +20,11 @@ export default function BookingPage() {
   const navigate = useNavigate();
   const { roomId } = useParams();
 
-  const [form, setForm] = useState({ checkInDate: "", checkOutDate: "" });
+  const [form, setForm] = useState({
+    checkInDate: null,
+    checkOutDate: null,
+  });
+
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(false);
   const [canceling, setCanceling] = useState(false);
@@ -25,24 +33,23 @@ export default function BookingPage() {
   const token = localStorage.getItem("token");
   const userEmail = localStorage.getItem("user_email");
 
+  // 👉 TEMP price (later fetch from backend)
+  const pricePerNight = 2500;
+
   const nights = useMemo(() => {
     if (!form.checkInDate || !form.checkOutDate) return 0;
     const n = daysBetween(form.checkInDate, form.checkOutDate);
     return n > 0 ? n : 0;
   }, [form.checkInDate, form.checkOutDate]);
 
-  const onChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-    setError("");
-  };
+  const totalPrice = nights * pricePerNight;
 
   const validate = () => {
     if (!token) return "Please login first.";
     if (!roomId) return "Room ID not found.";
     if (!form.checkInDate) return "Select check-in date.";
     if (!form.checkOutDate) return "Select check-out date.";
-    if (new Date(form.checkOutDate) <= new Date(form.checkInDate))
+    if (form.checkOutDate <= form.checkInDate)
       return "Check-out must be after check-in.";
     return "";
   };
@@ -51,7 +58,6 @@ export default function BookingPage() {
     e.preventDefault();
     setError("");
 
-    // Redirect to login if not logged in
     if (!token) {
       navigate("/login", { state: { from: `/booking/${roomId}` } });
       return;
@@ -64,15 +70,14 @@ export default function BookingPage() {
     try {
       const bookingData = {
         roomId,
-        checkInDate: form.checkInDate,
-        checkOutDate: form.checkOutDate,
+        checkInDate: form.checkInDate.toISOString(),   // ✅ FIX
+        checkOutDate: form.checkOutDate.toISOString(), // ✅ FIX
         userEmail,
+        totalPrice,
       };
 
-      // Create booking via API
       const response = await createBookingApi(bookingData);
 
-      // Use backend booking or fallback for demo
       const createdBooking = response.booking || {
         bookingId: "booking-" + Date.now(),
         status: "CONFIRMED",
@@ -80,7 +85,6 @@ export default function BookingPage() {
 
       setBooking(createdBooking);
 
-      // Navigate to payment page
       navigate(`/payment/${createdBooking.bookingId}`);
     } catch (err) {
       console.error(err);
@@ -107,17 +111,17 @@ export default function BookingPage() {
     }
   };
 
-  const goLogin = () => navigate("/login", { state: { from: `/booking/${roomId}` } });
+  const goLogin = () =>
+    navigate("/login", { state: { from: `/booking/${roomId}` } });
 
   return (
     <main className="booking-page" style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
       <div className="container py-5" style={{ maxWidth: 820 }}>
         <div className="card shadow border-0 booking-card">
           <div className="card-body p-4 p-md-5">
+
             <h2 className="mb-3">Book Your Room</h2>
-            <p className="text-muted">
-              Room ID: <b>{roomId}</b>
-            </p>
+            <p className="text-muted">Room ID: <b>{roomId}</b></p>
 
             {!token && (
               <div className="mb-3">
@@ -132,33 +136,46 @@ export default function BookingPage() {
             {token && (
               <form onSubmit={onSubmit}>
                 <div className="row g-3">
+
+                  {/* CHECK-IN */}
                   <div className="col-md-6">
                     <label className="form-label">Check-in Date</label>
-                    <input
-                      type="date"
-                      name="checkInDate"
-                      value={form.checkInDate}
-                      onChange={onChange}
+                    <DatePicker
+                      selected={form.checkInDate}
+                      onChange={(date) =>
+                        setForm((prev) => ({ ...prev, checkInDate: date }))
+                      }
                       className="form-control"
+                      minDate={new Date()}
+                      placeholderText="Select check-in"
                     />
                   </div>
 
+                  {/* CHECK-OUT */}
                   <div className="col-md-6">
                     <label className="form-label">Check-out Date</label>
-                    <input
-                      type="date"
-                      name="checkOutDate"
-                      value={form.checkOutDate}
-                      onChange={onChange}
+                    <DatePicker
+                      selected={form.checkOutDate}
+                      onChange={(date) =>
+                        setForm((prev) => ({ ...prev, checkOutDate: date }))
+                      }
                       className="form-control"
+                      minDate={form.checkInDate || new Date()}
+                      placeholderText="Select check-out"
                     />
                   </div>
 
+                  {/* SUMMARY */}
                   <div className="col-12">
                     <div className="p-3 bg-light border rounded">
-                      Nights: <b>{nights}</b>
+                      <p className="mb-1">Nights: <b>{nights}</b></p>
+                      <p className="mb-1">Price/Night: ₹{pricePerNight}</p>
+                      <p className="mb-0">
+                        Total: <b>₹{totalPrice}</b>
+                      </p>
                     </div>
                   </div>
+
                 </div>
 
                 <div className="mt-4 d-flex gap-2">
@@ -174,12 +191,8 @@ export default function BookingPage() {
 
             {booking && (
               <div className="mt-4 border-top pt-3">
-                <p>
-                  <b>Booking ID:</b> {booking.bookingId}
-                </p>
-                <p>
-                  <b>Status:</b> {booking.status}
-                </p>
+                <p><b>Booking ID:</b> {booking.bookingId}</p>
+                <p><b>Status:</b> {booking.status}</p>
 
                 <button
                   className="btn btn-danger"
@@ -190,6 +203,7 @@ export default function BookingPage() {
                 </button>
               </div>
             )}
+
           </div>
         </div>
       </div>
